@@ -11,10 +11,12 @@ namespace Testing
     {
         static void Main(string[] args)
         {
+            var thermostat = new Thermostat();
 
-            Console.WriteLine(Thermostat.GetCurrentTemprature());
+            Console.WriteLine(thermostat.LockedState);
+            thermostat.LockedState = true;
+            Console.WriteLine(thermostat.LockedState);
             
-
             Console.ReadKey();
         }
     }

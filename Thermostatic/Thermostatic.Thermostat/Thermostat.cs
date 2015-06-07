@@ -13,53 +13,144 @@ using System.Net.Http.Headers;
 using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Serialization;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Schema;
 using Thermostatic.Thermostat.Properties;
 
 namespace Thermostatic.Thermostat
 {
     public class Thermostat
     {
-        private static int _id = Settings.Default.ThermostatID;
+        private int _id = Settings.Default.ThermostatID;
+        private bool _cacheInvalid;
 
-        public class ThermostatWebInterfaceFactory
+        public Thermostat() {}
+
+        public Thermostat(int id)
         {
-            public static HttpClient Get()
+            Id = id;
+        }
+
+        public int Id
+        {
+            get { return _id; }
+            set
             {
-                return new HttpClient {BaseAddress = new Uri(Settings.Default.ThermostatWebInterface)};
+                _id = UseOrCreateThermostat(value);
+                Settings.Default.ThermostatID = _id;
             }
         }
 
-        public static int UseOrCreateThermostat(int thermostatId)
+        public string Day
         {
-            var response = ThermostatWebInterfaceFactory.Get().PutAsync(Settings.Default.Path + _id, null).Result;
+            get { return GetThermostatData().GetElementsByTagName("current_day").Item(0).InnerText; }
+            set { UpdateThermostat("day", "current_day", value); }
+        }
 
-            if (response.StatusCode != HttpStatusCode.OK && response.StatusCode != HttpStatusCode.Created)
-                throw new Exception("Allready existing id: " + _id);
+        public string Time
+        {
+            get { return GetThermostatData().GetElementsByTagName("time").Item(0).InnerText; }
+            set { UpdateThermostat("time", "time", value); }
+        }
+
+        public float CurrentTemperature
+        {
+            get
+            {
+                return float.Parse(GetThermostatData().GetElementsByTagName("current_temperature").Item(0).InnerText,
+                    CultureInfo.InvariantCulture); 
+            }
+        }
+
+        public float TargetTemperature
+        {
+            get
+            {
+                return float.Parse(GetThermostatData().GetElementsByTagName("target_temperature").Item(0).InnerText,
+                    CultureInfo.InvariantCulture); 
+            }
+            set 
+            {
+                UpdateThermostat("currentTemperature", "current_temperature", value.ToString(CultureInfo.InvariantCulture));
+            }
+        }
+
+        public float DayTemperature
+        {
+            get
+            {
+                return float.Parse(GetThermostatData().GetElementsByTagName("day_temperature").Item(0).InnerText,
+                    CultureInfo.InvariantCulture);
+            }
+            set
+            {
+                UpdateThermostat("dayTemperature", "day_temperature", value.ToString(CultureInfo.InvariantCulture));
+            }
+        }
+
+        public float NightTemperature
+        {
+            get
+            {
+                return float.Parse(GetThermostatData().GetElementsByTagName("night_temperature").Item(0).InnerText,
+                    CultureInfo.InvariantCulture);
+            }
+            set
+            {
+                UpdateThermostat("nightTemperature", "night_temperature", value.ToString(CultureInfo.InvariantCulture));
+            }
+        }
+
+        public bool LockedState
+        {
+            get { return GetThermostatData().GetElementsByTagName("week_program_state").Item(0).InnerText != "on"; }
+            set
+            {
+                UpdateThermostat("weekProgramState", "week_program_state", value ? "off" : "on");
+            }
+        }
+
+        public static class ThermostatWebInterfaceFactory
+        {
+            public static HttpClient Get()
+            {
+                return new HttpClient {BaseAddress = new Uri(Settings.Default.ThermostatWebInterface) };
+            }
+        }
+
+        public void UpdateThermostat(string route, string elementName, string value)
+        {
+            var jobject = new JObject();
+            jobject[elementName] = value;
             
-            UseThermostat(thermostatId);
+            ThermostatWebInterfaceFactory.Get().PutAsJsonAsync(Settings.Default.Path + Id + "/" + route, jobject).Wait();
+            _cacheInvalid = true;
+        }
+
+        public int UseOrCreateThermostat(int thermostatId)
+        {
+            ThermostatWebInterfaceFactory.Get().PutAsync(Settings.Default.Path + Id, null).Wait();
+            
+            Settings.Default.LastUpdate = new DateTime(2000, 1, 1);
+            Settings.Default.Save();
+
             return thermostatId;
         }
 
-        public static void UseThermostat(int thermostatId)
-        {
-            _id = thermostatId;
-            Settings.Default.ThermostatID = thermostatId;
-        }
-
-        private static XmlDocument GetRawThermostatData()
+        private XmlDocument GetRawThermostatData()
         {
             var returningXml = new XmlDocument();
 
             returningXml.LoadXml(
                 ThermostatWebInterfaceFactory.Get()
-                    .GetAsync(Settings.Default.Path + _id)
+                    .GetAsync(Settings.Default.Path + Id)
                     .Result.Content.ReadAsStringAsync()
                     .Result);
 
             return returningXml;
         }
 
-        private static XmlDocument UpdateLocalThermostatData()
+        private XmlDocument UpdateLocalThermostatData()
         {
             var thermostatData = GetRawThermostatData();
             var serializer = new StringWriter();
@@ -69,54 +160,18 @@ namespace Thermostatic.Thermostat
             Settings.Default.LastUpdate = DateTime.Now;
             Settings.Default.Save();
 
+            _cacheInvalid = false;
             return thermostatData;
         }
 
-        private static XmlDocument GetThermostatData()
+        private XmlDocument GetThermostatData()
         {
-            if (DateTime.Now.Subtract(Settings.Default.LastUpdate).TotalSeconds >= 30) 
+            if (_cacheInvalid || DateTime.Now.Subtract(Settings.Default.LastUpdate).TotalSeconds >= 30) 
                 return UpdateLocalThermostatData();
             
             var thermostatDocument = new XmlDocument();
             thermostatDocument.LoadXml(Settings.Default.ThermostatData);
             return thermostatDocument;
         }
-
-        public static string GetDay()
-        {
-            return GetThermostatData().GetElementsByTagName("current_day").Item(0).InnerText;
-        }
-
-        public static string GetTime()
-        {
-            return GetThermostatData().GetElementsByTagName("time").Item(0).InnerText;
-        }
-
-        public static float GetTargetTemprature()
-        {
-            return float.Parse(GetThermostatData().GetElementsByTagName("target_temperature").Item(0).InnerText, CultureInfo.InvariantCulture);
-        }
-
-        public static float GetCurrentTemprature()
-        {
-            return float.Parse(GetThermostatData().GetElementsByTagName("current_temperature").Item(0).InnerText, CultureInfo.InvariantCulture);
-        }
-
-        public static float GetDayTemprature()
-        {
-            return float.Parse(GetThermostatData().GetElementsByTagName("day_temperature").Item(0).InnerText, CultureInfo.InvariantCulture);
-        }
-
-        public static float GetNightTemprature()
-        {
-            return float.Parse(GetThermostatData().GetElementsByTagName("night_temperature").Item(0).InnerText, CultureInfo.InvariantCulture);
-        }
-
-        public static bool IsLocked()
-        {
-            return GetThermostatData().GetElementsByTagName("week_program_state").Item(0).InnerText != "on";
-        }
-
-
     }
 }
