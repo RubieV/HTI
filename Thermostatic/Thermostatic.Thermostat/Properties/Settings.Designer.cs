@@ -82,5 +82,17 @@ namespace Thermostatic.Thermostat.Properties {
                 this["LastUpdate"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("30")]
+        public int CacheDurationSeconds {
+            get {
+                return ((int)(this["CacheDurationSeconds"]));
+            }
+            set {
+                this["CacheDurationSeconds"] = value;
+            }
+        }
     }
 }

@@ -1,8 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using Thermostatic.Thermostat;
 
 namespace Testing
@@ -13,9 +9,10 @@ namespace Testing
         {
             var thermostat = new Thermostat();
 
-            Console.WriteLine(thermostat.LockedState);
-            thermostat.LockedState = true;
-            Console.WriteLine(thermostat.LockedState);
+            Console.WriteLine(thermostat.Time);
+            thermostat.Time = "12:00";
+            Console.WriteLine("Setting: " + "12:00");
+            Console.WriteLine(thermostat.Time);
             
             Console.ReadKey();
         }
