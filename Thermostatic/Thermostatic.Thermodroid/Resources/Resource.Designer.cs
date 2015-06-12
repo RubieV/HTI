@@ -9,9 +9,9 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-[assembly: global::Android.Runtime.ResourceDesignerAttribute("Thermostatic.Thermodroid.Resource", IsApplication=true)]
+[assembly: global::Android.Runtime.ResourceDesignerAttribute("nl.maartenvisscher.thermodroid.Resource", IsApplication=true)]
 
-namespace Thermostatic.Thermodroid
+namespace nl.maartenvisscher.thermodroid
 {
 	
 	
@@ -41,17 +41,36 @@ namespace Thermostatic.Thermodroid
 			}
 		}
 		
+		public partial class Color
+		{
+			
+			// aapt resource value: 0x7f040002
+			public const int accent = 2130968578;
+			
+			// aapt resource value: 0x7f040000
+			public const int primary = 2130968576;
+			
+			// aapt resource value: 0x7f040001
+			public const int primary_dark = 2130968577;
+			
+			static Color()
+			{
+				global::Android.Runtime.ResourceIdManager.UpdateIdValues();
+			}
+			
+			private Color()
+			{
+			}
+		}
+		
 		public partial class Drawable
 		{
 			
 			// aapt resource value: 0x7f020000
-			public const int Icon = 2130837504;
+			public const int control_circle = 2130837504;
 			
 			// aapt resource value: 0x7f020001
-			public const int MainCircle = 2130837505;
-			
-			// aapt resource value: 0x7f020002
-			public const int monoandroidsplash = 2130837506;
+			public const int icon = 2130837505;
 			
 			static Drawable()
 			{
@@ -66,11 +85,17 @@ namespace Thermostatic.Thermodroid
 		public partial class Id
 		{
 			
-			// aapt resource value: 0x7f060000
-			public const int Circle = 2131099648;
+			// aapt resource value: 0x7f070001
+			public const int TemperatureUp = 2131165185;
 			
-			// aapt resource value: 0x7f060001
-			public const int TemperatureUp = 2131099649;
+			// aapt resource value: 0x7f070000
+			public const int controlCircleLayout = 2131165184;
+			
+			// aapt resource value: 0x7f070002
+			public const int controlFragment = 2131165186;
+			
+			// aapt resource value: 0x7f070003
+			public const int titles_fragment = 2131165187;
 			
 			static Id()
 			{
@@ -86,7 +111,10 @@ namespace Thermostatic.Thermodroid
 		{
 			
 			// aapt resource value: 0x7f030000
-			public const int Main = 2130903040;
+			public const int control_fragment = 2130903040;
+			
+			// aapt resource value: 0x7f030001
+			public const int main = 2130903041;
 			
 			static Layout()
 			{
@@ -101,11 +129,11 @@ namespace Thermostatic.Thermodroid
 		public partial class String
 		{
 			
-			// aapt resource value: 0x7f040001
-			public const int ApplicationName = 2130968577;
+			// aapt resource value: 0x7f050000
+			public const int AppName = 2131034112;
 			
-			// aapt resource value: 0x7f040000
-			public const int Hello = 2130968576;
+			// aapt resource value: 0x7f050001
+			public const int Timetable = 2131034113;
 			
 			static String()
 			{
@@ -120,8 +148,8 @@ namespace Thermostatic.Thermodroid
 		public partial class Style
 		{
 			
-			// aapt resource value: 0x7f050000
-			public const int Mono_Android_Theme_Splash = 2131034112;
+			// aapt resource value: 0x7f060000
+			public const int AppTheme = 2131099648;
 			
 			static Style()
 			{
