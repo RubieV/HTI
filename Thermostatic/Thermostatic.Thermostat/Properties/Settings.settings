@@ -15,7 +15,7 @@
       <Value Profile="(Default)" />
     </Setting>
     <Setting Name="LastUpdate" Type="System.DateTime" Scope="User">
-      <Value Profile="(Default)">2000-01-01</Value>
+      <Value Profile="(Default)" />
     </Setting>
     <Setting Name="CacheDurationSeconds" Type="System.Int32" Scope="User">
       <Value Profile="(Default)">30</Value>
