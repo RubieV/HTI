@@ -3,4 +3,12 @@
     <color name="primary">#009688</color> <!-- 500 -->
     <color name="primary_dark">#00796B</color> <!-- 700 -->
     <color name="accent">#FFD740</color>
+    <color name="light_bg_primary_text">#DF000000</color>
+    <color name="light_bg_secondary_text">#8A000000</color>
+    <color name="light_bg_disabled_text">#43000000</color>
+    <color name="light_bg_divider">#1F000000</color>
+    <color name="dark_bg_primary_text">#FFFFFFFF</color>
+    <color name="dark_bg_secondary_text">#B3FFFFFF</color>
+    <color name="dark_bg_disabled_text">#4DFFFFFF</color>
+    <color name="dark_bg_divider">#1FFFFFFF</color>
 </resources>

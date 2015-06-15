@@ -8,7 +8,7 @@
         <item name="android:colorPrimaryDark">@color/primary_dark</item>
         <!--   theme UI controls like checkboxes and text fields -->
         <item name="android:colorAccent">@color/accent</item>
-        <item name="android:textColorPrimary">#FFFFFFFF</item>
+        <!--<item name="android:textColorPrimary">#FFFFFFFF</item>--> <!-- TODO color the action bar text in a cleaner way! -->
     </style>
 
     <style name="Subheader">
@@ -17,10 +17,10 @@
         <item name="android:gravity">center_vertical</item>
         <item name="android:fontFamily">sans-serif-medium</item>
         <item name="android:textSize">14sp</item>
-        <item name="android:textColor">#8A000000</item>
+        <item name="android:textColor">@color/light_bg_secondary_text</item>
         <item name="android:paddingLeft">16dp</item>
         <item name="android:paddingRight">16dp</item>
-        <item name="android:background">#1F000000</item>
+        <item name="android:background">@color/light_bg_divider</item>
     </style>
 
     <style name="Display1">
@@ -30,10 +30,14 @@
         <item name="android:paddingRight">16dp</item>
         <item name="android:gravity">center_vertical</item>
         <item name="android:textSize">34sp</item>
-        <item name="android:textColor">#DF000000</item>
+        <item name="android:textColor">@color/light_bg_primary_text</item>
+    </style>
+    <style name="Display1noLayout">
+        <item name="android:textSize">34sp</item>
+        <item name="android:textColor">@color/light_bg_primary_text</item>
     </style>
 
-    <style name="Title">
+    <!--<style name="Title">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">56dp</item>
         <item name="android:paddingLeft">16dp</item>
@@ -42,5 +46,5 @@
         <item name="android:textSize">20sp</item>
         <item name="android:textColor">#FFFFFFFF</item>
         <item name="android:fontFamily">sans-serif-medium</item>
-    </style>
+    </style>-->
 </resources>
