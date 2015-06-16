@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primary">#009688</color> <!-- 500 -->
-    <color name="primary_dark">#00796B</color> <!-- 700 -->
-    <color name="accent">#FFD740</color>
+    <color name="primary">#FF9800</color> <!-- 500 -->
+    <color name="primary_dark">#F57C00</color> <!-- 700 -->
+    <color name="accent">#DD2C00</color>
     <color name="light_bg_primary_text">#DF000000</color>
     <color name="light_bg_secondary_text">#8A000000</color>
     <color name="light_bg_disabled_text">#43000000</color>

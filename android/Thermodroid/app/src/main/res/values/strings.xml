@@ -3,4 +3,33 @@
     <string name="current_temperature">Current temperature</string>
     <string name="target_temperature">Target temperature</string>
     <string name="week_program">Week program</string>
+
+    <string-array name="target_temperatures">
+        <item>5.0 \u00B0C</item>
+        <item>6.0 \u00B0C</item>
+        <item>7.0 \u00B0C</item>
+        <item>8.0 \u00B0C</item>
+        <item>9.0 \u00B0C</item>
+        <item>10.0 \u00B0C</item>
+        <item>11.0 \u00B0C</item>
+        <item>12.0 \u00B0C</item>
+        <item>13.0 \u00B0C</item>
+        <item>14.0 \u00B0C</item>
+        <item>15.0 \u00B0C</item>
+        <item>16.0 \u00B0C</item>
+        <item>17.0 \u00B0C</item>
+        <item>18.0 \u00B0C</item>
+        <item>19.0 \u00B0C</item>
+        <item>20.0 \u00B0C</item>
+        <item>21.0 \u00B0C</item>
+        <item>22.0 \u00B0C</item>
+        <item>23.0 \u00B0C</item>
+        <item>24.0 \u00B0C</item>
+        <item>25.0 \u00B0C</item>
+        <item>26.0 \u00B0C</item>
+        <item>27.0 \u00B0C</item>
+        <item>28.0 \u00B0C</item>
+        <item>29.0 \u00B0C</item>
+        <item>30.0 \u00B0C</item>
+    </string-array>
 </resources>

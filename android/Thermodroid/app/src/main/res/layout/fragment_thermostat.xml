@@ -1,98 +1,94 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:tools="http://schemas.android.com/tools"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView
+        android:id="@+id/scrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            tools:context=".ThermostatFragment">
+
+            <TextView
+                android:id="@+id/currentTempDesc"
+                style="@style/Subheader"
+                android:gravity="center"
+                android:text="@string/current_temperature" />
+
+            <TextView
+                android:id="@+id/currentTemp"
+                style="@style/Display1"
+                android:gravity="center"
+                android:visibility="gone" />
+
+            <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                tools:context=".ThermostatFragment"
-                android:focusable="false"
-                android:focusableInTouchMode="false">
+                android:layout_height="72dp"
+                android:id="@+id/currentTempLoading">
 
-    <TextView
-        android:text="@string/current_temperature"
-        android:id="@+id/textView"
-        style="@style/Subheader"
-        />
+                <ProgressBar
+                    android:id="@+id/progressBar"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_centerHorizontal="true" />
+            </RelativeLayout>
 
-    <TextView
-        android:text="21.3 \u00B0C"
-        android:id="@+id/textView2"
-        android:layout_below="@+id/textView"
-        android:layout_alignLeft="@+id/textView"
-        android:layout_alignStart="@+id/textView"
-        style="@style/Display1"
-        android:gravity="center"/>
+            <TextView
+                android:id="@+id/targetTempDesc"
+                style="@style/Subheader"
+                android:gravity="center"
+                android:text="@string/target_temperature" />
 
-    <TextView
-        android:text="@string/target_temperature"
-        android:id="@+id/textView3"
-        android:layout_below="@+id/textView2"
-        android:layout_alignLeft="@+id/textView2"
-        android:layout_alignStart="@+id/textView2"
-        style="@style/Subheader"/>
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="72dp"
+                android:id="@+id/targetTempLoading">
 
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_width="wrap_content"
-        android:layout_height="72dp"
-        android:id="@+id/linearLayout"
-        android:layout_below="@+id/textView3"
-        android:layout_centerHorizontal="true"
-        android:gravity="center_vertical">
+                <ProgressBar
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/progressBar2"
+                    android:layout_centerVertical="true"
+                    android:layout_centerHorizontal="true" />
+            </RelativeLayout>
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="+"
-            android:id="@+id/button2"/>
+            <Spinner
+                android:id="@+id/targetTemp"
+                style="@style/Display1"
+                android:layout_width="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:gravity="center"
+                android:visibility="gone" />
 
-        <EditText
-            android:text="21.0"
-            android:id="@+id/textView4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            style="@style/Display1noLayout"
-            android:layout_below="@+id/textView3"
-            android:layout_centerHorizontal="true"
-            android:inputType="number|numberDecimal"
-            android:numeric="decimal"
-            />
+            <SeekBar
+                android:id="@+id/targetTempBar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text=" \u00B0C"
-            android:id="@+id/textView5"
-            style="@style/Display1noLayout"/>
+            <TextView
+                android:id="@+id/textView6"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:gravity="center_vertical"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:text="In 10 minutes the target will be 16 \u00B0C"
+                android:textColor="@color/light_bg_primary_text" />
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="-"
-            android:id="@+id/button"/>
+            <Switch
+                android:id="@+id/switch1"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:text="Lock temperature" />
 
-    </LinearLayout>
-
-    <TextView
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:text="In 10 minutes the target will be 16 \u00B0C"
-        android:id="@+id/textView6"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:gravity="center_vertical"
-        android:textColor="@color/light_bg_primary_text"
-        android:layout_below="@+id/switch1"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"/>
-
-    <Switch
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:text="Lock temperature"
-        android:id="@+id/switch1"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:layout_below="@+id/linearLayout"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"/>
-
-</RelativeLayout>
+        </LinearLayout>
+    </ScrollView>
+</FrameLayout>
