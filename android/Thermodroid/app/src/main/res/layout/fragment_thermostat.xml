@@ -1,9 +1,9 @@
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
     <ScrollView
-        android:id="@+id/scrollView"
+        android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
@@ -14,29 +14,26 @@
             tools:context=".ThermostatFragment">
 
             <TextView
+                android:id="@+id/time"
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:fontFamily="@string/font_body1"
+                android:gravity="center_vertical"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:textColor="@color/light_bg_secondary_text"
+                android:textSize="@dimen/text_body" />
+
+            <TextView
                 android:id="@+id/currentTempDesc"
                 style="@style/Subheader"
                 android:gravity="center"
-                android:text="@string/current_temperature" />
+                android:text="@string/current_temp_desc" />
 
             <TextView
                 android:id="@+id/currentTemp"
                 style="@style/Display1"
-                android:gravity="center"
-                android:visibility="gone" />
-
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="72dp"
-                android:id="@+id/currentTempLoading">
-
-                <ProgressBar
-                    android:id="@+id/progressBar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerVertical="true"
-                    android:layout_centerHorizontal="true" />
-            </RelativeLayout>
+                android:gravity="center" />
 
             <TextView
                 android:id="@+id/targetTempDesc"
@@ -44,42 +41,17 @@
                 android:gravity="center"
                 android:text="@string/target_temperature" />
 
-            <RelativeLayout
-                android:layout_width="match_parent"
-                android:layout_height="72dp"
-                android:id="@+id/targetTempLoading">
-
-                <ProgressBar
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/progressBar2"
-                    android:layout_centerVertical="true"
-                    android:layout_centerHorizontal="true" />
-            </RelativeLayout>
-
             <Spinner
                 android:id="@+id/targetTemp"
                 style="@style/Display1"
                 android:layout_width="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:gravity="center"
-                android:visibility="gone" />
+                android:gravity="center" />
 
             <SeekBar
                 android:id="@+id/targetTempBar"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:visibility="gone" />
-
-            <TextView
-                android:id="@+id/textView6"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:gravity="center_vertical"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
-                android:text="In 10 minutes the target will be 16 \u00B0C"
-                android:textColor="@color/light_bg_primary_text" />
+                android:layout_height="wrap_content" />
 
             <Switch
                 android:id="@+id/switch1"
@@ -87,8 +59,43 @@
                 android:layout_height="48dp"
                 android:paddingLeft="16dp"
                 android:paddingRight="16dp"
-                android:text="Lock temperature" />
+                android:text="In 10 minutes the target temperature changes to 16 degrees Celcius, click here to lock the temperature."
+                android:textColor="@color/light_bg_primary_text" />
 
         </LinearLayout>
     </ScrollView>
-</FrameLayout>
+
+    <RelativeLayout
+        android:id="@+id/message"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/messageText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true"
+            android:fontFamily="@string/font_body2"
+            android:padding="16dp"
+            android:text="@string/connection_message"
+            android:textColor="@color/light_bg_primary_text" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone">
+
+        <ProgressBar
+            android:id="@+id/progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:layout_centerVertical="true" />
+    </RelativeLayout>
+
+</RelativeLayout>
