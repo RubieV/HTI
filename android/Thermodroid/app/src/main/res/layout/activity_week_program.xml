@@ -1,7 +1,7 @@
 <fragment xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/week_program_fragment"
-    android:name="nl.maartenvisscher.thermodroid.ThermostatFragment"
+    android:name="nl.maartenvisscher.thermodroid.WeekProgramFragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:layout="@layout/fragment_thermostat" />
+    tools:layout="@layout/fragment_week_program" />

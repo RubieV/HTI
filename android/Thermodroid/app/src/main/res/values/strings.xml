@@ -4,9 +4,12 @@
     <string name="current_temp">%1$s \u00B0C</string>
     <string name="time">%1$s %2$s</string>
     <string name="target_temperature">Target temperature</string>
-    <string name="connection_message">The thermostat couldn\'t be reached, are you connected to the internet?
-        Click anywhere to try again.</string>
+    <string name="connection_message">The thermostat couldn\'t be reached, are you connected to the
+        internet? Click anywhere to try again.</string>
     <string name="week_program">Week program</string>
+    <string name="week_program_period">%1$s\u2014%2$s</string>
+    <string name="action_restore">Restore to defaults</string>
+    <string name="action_delete">Remove all records</string>
 
     <string-array name="target_temperatures">
         <item>5.0 \u00B0C</item>
@@ -37,6 +40,19 @@
         <item>30.0 \u00B0C</item>
     </string-array>
 
+    <string-array name="week_days">
+        <item>Monday</item>
+        <item>Tuesday</item>
+        <item>Wednesday</item>
+        <item>Thursday</item>
+        <item>Friday</item>
+        <item>Saturday</item>
+        <item>Sunday</item>
+    </string-array>
+
     <string name="font_body1">sans-serif</string>
     <string name="font_body2">sans-serif-medium</string>
+    <string name="title_activity_week_program">Week program</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
 </resources>

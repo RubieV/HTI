@@ -1,14 +1,16 @@
 package nl.maartenvisscher.thermodroid;
 
 import android.app.Fragment;
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
 import android.widget.RelativeLayout;
-import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
@@ -22,11 +24,12 @@ import java.net.ConnectException;
 public class ThermostatFragment extends Fragment {
     public static final String TAG = "ThermostatFragment";
 
+    private volatile boolean mInterrupt;
     private Thread mDataThread;
     private View mView;
     private TextView mTime;
     private TextView mCurrentTemp;
-    private ScrollView mMain;
+    private FrameLayout mMain;
     private RelativeLayout mLoading;
     private RelativeLayout mMessage;
 
@@ -41,9 +44,10 @@ public class ThermostatFragment extends Fragment {
         mView = inflater.inflate(R.layout.fragment_thermostat, container, false);
         mTime = (TextView) mView.findViewById(R.id.time);
         mCurrentTemp = (TextView) mView.findViewById(R.id.currentTemp);
-        mMain = (ScrollView) mView.findViewById(R.id.main);
+        mMain = (FrameLayout) mView.findViewById(R.id.main);
         mLoading = (RelativeLayout) mView.findViewById(R.id.loading);
         mMessage = (RelativeLayout) mView.findViewById(R.id.message);
+        FloatingActionButton mWeekProgram = (FloatingActionButton) mView.findViewById(R.id.weekProgramButton);
 
         setVisibleView(mLoading);
 
@@ -51,6 +55,13 @@ public class ThermostatFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 connect();
+            }
+        });
+        mWeekProgram.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(v.getContext(), WeekProgramActivity.class);
+                startActivity(intent);
             }
         });
 
@@ -63,15 +74,15 @@ public class ThermostatFragment extends Fragment {
     }
 
     @Override
-    public void onResume() {
+    public void onStart() {
         connect();
-        super.onResume();
+        super.onStart();
     }
 
     @Override
-    public void onPause() {
-        mDataThread.interrupt();
-        super.onPause();
+    public void onStop() {
+        mInterrupt = true;
+        super.onStop();
     }
 
     private void showData(String currentTemp, String day, String time) {
@@ -95,7 +106,11 @@ public class ThermostatFragment extends Fragment {
     }
 
     private void connect() {
+        if (mDataThread != null && mDataThread.isAlive()) {
+            Log.e(TAG, "mDataThread is alive while it shouldn't!"); // TODO: remove this for production.
+        }
         setVisibleView(mLoading);
+        mInterrupt = false;
         mDataThread = new Thread(new DataRunnable());
         mDataThread.start();
     }
@@ -104,7 +119,7 @@ public class ThermostatFragment extends Fragment {
         @Override
         public void run() {
             Log.d(TAG, "DataRunnable started");
-            while (!Thread.interrupted()) {
+            while (!mInterrupt) {
                 try {
                     final String currentTemperature = HeatingSystem.get("currentTemperature");
                     if (currentTemperature == null) throw new ConnectException("null");
@@ -126,7 +141,7 @@ public class ThermostatFragment extends Fragment {
                             showConnectionMessage();
                         }
                     });
-                    break; // TODO: instead of breaking automatically try to reconnect
+                    break; // TODO: instead of breaking, automatically try to reconnect (just remove this break, but leave it for now)
                 }
                 try {
                     Thread.sleep(10);

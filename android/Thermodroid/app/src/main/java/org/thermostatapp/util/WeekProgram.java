@@ -13,7 +13,7 @@ public class WeekProgram {
             "Thursday", "Friday", "Saturday", "Sunday"};
     /* Switches are stored in a hashmap, mapping every day to its
     corresponding set of switches */
-    Map<String, ArrayList<Switch>> data = new HashMap<String, ArrayList<Switch>>();
+    public Map<String, ArrayList<Switch>> data = new HashMap<String, ArrayList<Switch>>();
     private int[] nr_switches_active;
 
     /**
