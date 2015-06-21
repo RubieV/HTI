@@ -9,14 +9,11 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/days"
+        <LinearLayout
+            android:id="@+id/day_buttons"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/light_bg_divider"
-            android:fontFamily="@string/font_body2"
-            android:textColor="@color/light_bg_primary_text"
-            android:textSize="@dimen/text_body" />
+            android:orientation="horizontal"></LinearLayout>
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/day_program_recycler_view"

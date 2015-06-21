@@ -1,25 +1,60 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="48dp"
-    android:orientation="horizontal">
+    android:layout_height="48dp">
 
     <ImageView
         android:id="@+id/imageView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
         android:layout_marginLeft="16dp"
+        android:layout_marginStart="16dp"
+        android:contentDescription="@string/day_temperature"
         android:src="@drawable/ic_brightness_7_black_24dp" />
+
+    <Button
+        android:id="@+id/btn_begin_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="false"
+        android:layout_centerVertical="true"
+        android:layout_marginLeft="72dp"
+        android:layout_marginStart="72dp"
+        android:theme="@style/WhiteButton" />
 
     <TextView
         android:id="@+id/text_view"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_vertical"
-        android:layout_marginLeft="32dp"
-        android:layout_marginRight="16dp"
+        android:layout_centerVertical="true"
+        android:layout_toEndOf="@+id/btn_begin_time"
+        android:layout_toRightOf="@+id/btn_begin_time"
+        android:text="\u2014"
         android:textColor="@color/light_bg_primary_text"
         android:textSize="16sp" />
 
-</LinearLayout>
+    <Button
+        android:id="@+id/btn_end_time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerVertical="true"
+        android:layout_toEndOf="@+id/text_view"
+        android:layout_toRightOf="@+id/text_view"
+        android:theme="@style/WhiteButton" />
+
+    <ImageButton
+        android:id="@+id/btn_remove_period"
+        style="?android:attr/borderlessButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:src="@drawable/ic_remove_black_24dp" />
+
+</RelativeLayout>

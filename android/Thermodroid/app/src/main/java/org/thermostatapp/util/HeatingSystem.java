@@ -199,7 +199,7 @@ public class HeatingSystem {
     /**
      * Retrieves all data except for weekProgram
      * @param attribute_name
-     *            = { "day", "time", "currentTemperature", "dayTemperature",
+     *            = { "day", "time", "currentTemperature", "mDayTemperature",
      *            "nightTemperature", "weekProgramState" }; Note that
      *            "weekProgram" has not been included, because it has a more
      *            complex value than a single value. Therefore the funciton
@@ -215,9 +215,9 @@ public class HeatingSystem {
         String link = "";
         boolean match = false;
         String[] valid_names = {"day", "time", "currentTemperature",
-                "dayTemperature", "nightTemperature", "weekProgramState"};
+                "dayTemperature", "nightTemperature", "weekProgramState", "targetTemperature"};
         String[] tag_names = {"current_day", "time", "current_temperature",
-                "day_temperature", "night_temperature", "week_program_state"};
+                "day_temperature", "night_temperature", "week_program_state", "target_temperature"};
         int i;
         for (i = 0; i < valid_names.length; i++) {
             if (attribute_name.equalsIgnoreCase(valid_names[i])) {
@@ -418,7 +418,7 @@ public class HeatingSystem {
         } else if (attribute_name.equals("currentTemperature")) {
             tag_name = "current_temperature";
             inTemperatureBoundaries(value);
-        } else if (attribute_name.equals("dayTemperature")) {
+        } else if (attribute_name.equals("mDayTemperature")) {
             tag_name = "day_temperature";
             inTemperatureBoundaries(value);
         } else if (attribute_name.equals("nightTemperature")) {

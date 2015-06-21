@@ -31,6 +31,7 @@ public class WeekProgramActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.action_restore:
+
                 mFragment.restoreWeekProgram(); // TODO first show dialog
                 return true;
             case R.id.action_delete:

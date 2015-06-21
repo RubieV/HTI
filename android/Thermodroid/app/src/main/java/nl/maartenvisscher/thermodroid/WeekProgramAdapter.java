@@ -1,12 +1,17 @@
 package nl.maartenvisscher.thermodroid;
 
+import android.content.ClipData;
+import android.content.Context;
 import android.content.res.Resources;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.DragEvent;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
+import android.widget.Button;
+import android.widget.LinearLayout;
 
 import org.thermostatapp.util.HeatingSystem;
 import org.thermostatapp.util.Switch;
@@ -23,6 +28,23 @@ public class WeekProgramAdapter extends RecyclerView.Adapter<WeekProgramAdapter.
     private ArrayList<DayProgramAdapter> mDayPrograms;
 
     public WeekProgramAdapter(WeekProgram weekProgram) {
+        setWeekProgram(weekProgram);
+    }
+
+    public void clearWeekProgram() {
+        notifyItemRangeRemoved(0, mDayPrograms.size());
+        mDayPrograms = new ArrayList<>();
+        mDayPrograms.add(new DayProgramAdapter(Day.values()));
+        notifyItemRangeInserted(0, mDayPrograms.size());
+    }
+
+    public void updateWeekProgram(WeekProgram weekProgram) {
+        notifyItemRangeRemoved(0, mDayPrograms.size());
+        setWeekProgram(weekProgram);
+        notifyItemRangeInserted(0, mDayPrograms.size());
+    }
+
+    private void setWeekProgram(WeekProgram weekProgram) {
         mDayPrograms = new ArrayList<>();
         for (String dayName : WeekProgram.valid_days) {
             Day day = stringToDay(dayName);
@@ -53,18 +75,6 @@ public class WeekProgramAdapter extends RecyclerView.Adapter<WeekProgramAdapter.
         return null;
     }
 
-    private String daysToString(Resources res, Day[] days) {
-        String result = dayToString(res, days[0]);
-        for (int i = 1; i < days.length; i += 1) {
-            result += ", " + dayToString(res, days[i]);
-        }
-        return result;
-    }
-
-    private String dayToString(Resources res, Day day) {
-        return res.getStringArray(R.array.week_days)[day.getIndex()];
-    }
-
     @Override
     public WeekProgramAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.week_program_item,
@@ -74,11 +84,22 @@ public class WeekProgramAdapter extends RecyclerView.Adapter<WeekProgramAdapter.
 
     @Override
     public void onBindViewHolder(WeekProgramAdapter.ViewHolder holder, int position) {
-        Resources res = holder.mTextView.getResources();
+        Context c = holder.mView.getContext();
+        Resources r = holder.mView.getResources();
         DayProgramAdapter dayProgram = mDayPrograms.get(position);
 
-        holder.mTextView.setText(daysToString(res, dayProgram.getDays()));
+        for (Day day : dayProgram.getDays()) {
+            String dayText = r.getStringArray(R.array.week_days)[day.getIndex()];
+            Button btn = new Button(c);
+            btn.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT));
+            btn.setText(dayText);
+            btn.setOnTouchListener(new DayTouchListener(day)); // Todo: maybe change to long click.
+            holder.mDayButtons.addView(btn);
+        }
         holder.mRecyclerView.setAdapter(dayProgram);
+        holder.mView.setOnDragListener(new MyDragListener());
     }
 
     @Override
@@ -90,13 +111,70 @@ public class WeekProgramAdapter extends RecyclerView.Adapter<WeekProgramAdapter.
         // TODO: get all switches and start upload thread
     }
 
+    // This defines your touch listener
+    private class DayTouchListener implements View.OnTouchListener {
+        private Day mDay;
+
+        DayTouchListener(Day day) {
+            mDay = day;
+        }
+
+        public boolean onTouch(View view, MotionEvent motionEvent) {
+            if (motionEvent.getAction() == MotionEvent.ACTION_DOWN) {
+                ClipData data = ClipData.newPlainText("weekday",
+                        WeekProgram.valid_days[mDay.getIndex()]);
+                View.DragShadowBuilder shadowBuilder = new View.DragShadowBuilder(view);
+                view.startDrag(data, shadowBuilder, view, 0);
+                view.setVisibility(View.INVISIBLE);
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+
+    // Todo continue here
+    private class MyDragListener implements View.OnDragListener {
+        @Override
+        public boolean onDrag(View v, DragEvent event) {
+            switch (event.getAction()) {
+                case DragEvent.ACTION_DRAG_STARTED:
+                    // do nothing
+                    break;
+                case DragEvent.ACTION_DRAG_ENTERED:
+                    //v.setBackgroundDrawable(enterShape);
+                    break;
+                case DragEvent.ACTION_DRAG_EXITED:
+                    //v.setBackgroundDrawable(normalShape);
+                    break;
+                case DragEvent.ACTION_DROP:
+                    // Dropped, reassign View to ViewGroup
+                    View view = (View) event.getLocalState();
+                    ViewGroup owner = (ViewGroup) view.getParent();
+                    owner.removeView(view);
+                    LinearLayout container = (LinearLayout) v.findViewById(R.id.day_buttons);
+                    container.addView(view);
+                    view.setVisibility(View.VISIBLE);
+                    break;
+                case DragEvent.ACTION_DRAG_ENDED:
+                    //v.setBackgroundDrawable(normalShape);
+                    break;
+                default:
+                    break;
+            }
+            return true;
+        }
+    }
+
     class ViewHolder extends RecyclerView.ViewHolder {
-        TextView mTextView;
+        View mView;
+        LinearLayout mDayButtons;
         RecyclerView mRecyclerView;
 
         public ViewHolder(View v) {
             super(v);
-            mTextView = (TextView) v.findViewById(R.id.days);
+            mView = v;
+            mDayButtons = (LinearLayout) v.findViewById(R.id.day_buttons);
             mRecyclerView = (RecyclerView) v.findViewById(R.id.day_program_recycler_view);
             mRecyclerView.setLayoutManager(new LinearLayoutManager(v.getContext()));
         }
