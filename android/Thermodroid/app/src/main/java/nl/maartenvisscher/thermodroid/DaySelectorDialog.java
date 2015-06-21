@@ -7,7 +7,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Ruben on 21-6-2015.
@@ -16,31 +16,36 @@ import java.util.ArrayList;
 @SuppressLint("ValidFragment")
 class DaySelectorDialog extends DialogFragment {
 
+    private List<Day> mDays;
+    private DialogInterface.OnClickListener mListener;
+
+    DaySelectorDialog(List<Day> days, DialogInterface.OnClickListener listener) {
+        mDays = days;
+        mListener = listener;
+    }
+
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
-        final ArrayList<String> mSelectedItems = new ArrayList();
+        boolean[] selectedItems = new boolean[7];
+        for (Day day : mDays) {
+            selectedItems[day.getIndex()] = true;
+        }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setTitle("Pick days")
-                .setMultiChoiceItems(new String[]{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"}, null,
+                .setMultiChoiceItems(R.array.week_days, selectedItems,
                         new DialogInterface.OnMultiChoiceClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which,
                                                 boolean isChecked) {
                                 if (isChecked) {
-                                    // If the user checked the item, add it to the selected items
-                                    mSelectedItems.add(new String[]{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"}[which]);
-                                } else if (mSelectedItems.contains(which)) {
-                                    // Else, if the item is already in the array, remove it
-                                    mSelectedItems.remove(new String[]{"Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"}[which]);
+                                    mDays.add(Day.values()[which]);
+                                } else {
+                                    mDays.remove(Day.values()[which]);
                                 }
                             }
                         })
-                .setPositiveButton("Set", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-
-                    }
-                })
+                .setPositiveButton("Set", mListener)
                 .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
 

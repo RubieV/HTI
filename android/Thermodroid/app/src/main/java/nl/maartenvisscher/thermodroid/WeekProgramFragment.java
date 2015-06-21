@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +24,7 @@ import org.thermostatapp.util.InvalidInputValueException;
 import org.thermostatapp.util.WeekProgram;
 
 import java.net.ConnectException;
+import java.util.List;
 
 /**
  * A placeholder fragment containing a simple view.
@@ -124,6 +126,13 @@ public class WeekProgramFragment extends Fragment {
         mAdapter.clearWeekProgram();
     }
 
+    public void addDays(List<Day> days) {
+        if (mAdapter == null) {
+            return;
+        }
+        mAdapter.addDays(days);
+    }
+
     private void setTemperatureFromInput(boolean day, TextView input) {
         float temperature = Float.parseFloat(input.getText().toString());
         temperature = (float) Math.round(temperature * 10f) / 10f;
@@ -150,7 +159,7 @@ public class WeekProgramFragment extends Fragment {
     }
 
     private void connect() {
-        new Thread(new Downloader()).start();
+        new Thread(new Downloader(this)).start();
     }
 
     private void showConnectionMessage() {
@@ -187,6 +196,11 @@ public class WeekProgramFragment extends Fragment {
     }
 
     private class Downloader implements Runnable {
+        Fragment mFragment;
+
+        Downloader(Fragment fragment) {
+            mFragment = fragment;
+        }
         @Override
         public void run() {
             WeekProgram weekProgram;
@@ -203,8 +217,10 @@ public class WeekProgramFragment extends Fragment {
                     }
                 });
             } catch (ConnectException e) {
+                Log.e(TAG, "ConnectException: " + e.getMessage());
                 weekProgram = null;
             } catch (CorruptWeekProgramException e) {
+                Log.e(TAG, "CorruptWeekProgramException: " + e.getMessage());
                 weekProgram = new WeekProgram();
                 HeatingSystem.setWeekProgram(weekProgram);
             }
@@ -214,7 +230,7 @@ public class WeekProgramFragment extends Fragment {
                 mView.post(new Runnable() {
                     @Override
                     public void run() {
-                        mAdapter = new WeekProgramAdapter(weekProgramFinal);
+                        mAdapter = new WeekProgramAdapter(weekProgramFinal, mFragment);
                         mRecyclerView.setAdapter(mAdapter);
                         setVisibleView(mMain);
                     }

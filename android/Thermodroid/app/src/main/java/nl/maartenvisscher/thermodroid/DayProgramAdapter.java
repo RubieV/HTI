@@ -15,6 +15,7 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.TimePicker;
+import android.widget.Toast;
 
 import org.thermostatapp.util.Switch;
 
@@ -39,19 +40,22 @@ public class DayProgramAdapter extends RecyclerView.Adapter<DayProgramAdapter.Vi
      */
     private List<DayPart> mDayLayout;
     private RecyclerView mObserver = null;
+    private WeekProgramAdapter mAdapter;
 
-    public DayProgramAdapter(Day[] days) {
+    public DayProgramAdapter(Day[] days, WeekProgramAdapter adapter) {
         mDays = new ArrayList<>();
         mDays.addAll(Arrays.asList(days));
         mDayProgram = new ArrayList<>();
-        updateDayLayout();
+        mAdapter = adapter;
+        updateDayLayout(false);
     }
 
-    public DayProgramAdapter(Day day, List<Switch> dayProgram) {
+    public DayProgramAdapter(Day day, List<Switch> dayProgram, WeekProgramAdapter adapter) {
         mDays = new ArrayList<>();
         mDays.add(day);
         mDayProgram = switchesToPeriods(dayProgram);
-        updateDayLayout();
+        mAdapter = adapter;
+        updateDayLayout(false);
     }
 
     /**
@@ -83,8 +87,12 @@ public class DayProgramAdapter extends RecyclerView.Adapter<DayProgramAdapter.Vi
         mDays.add(day);
     }
 
-    public Day[] getDays() {
-        return mDays.toArray(new Day[mDays.size()]);
+    public List<Day> getDays() {
+        return mDays;
+    }
+
+    public void setDays(List<Day> days) {
+        mDays = days;
     }
 
     private List<Period> switchesToPeriods(List<Switch> switches) {
@@ -109,7 +117,24 @@ public class DayProgramAdapter extends RecyclerView.Adapter<DayProgramAdapter.Vi
     }
 
     private List<Switch> periodsToSwitches(List<Period> periods) {
-        return new ArrayList<>(); // TODO
+        List<Switch> switches = new ArrayList<>();
+        for (Period period : periods) {
+            String beginTime = period.getBeginText();
+            if (beginTime.length() == 4) {
+                beginTime = "0" + beginTime;
+            }
+            String endTime = period.getEndText();
+            if (endTime.length() == 4) {
+                endTime = "0" + endTime;
+            }
+            switches.add(new Switch("day", true, beginTime));
+            switches.add(new Switch("night", true, endTime));
+        }
+        while (switches.size() < 10) {
+            switches.add(new Switch("day", false, "01:00"));
+            switches.add(new Switch("night", false, "01:00"));
+        }
+        return switches;
     }
 
     private int[] timeStringToInt(String time) {
@@ -122,7 +147,11 @@ public class DayProgramAdapter extends RecyclerView.Adapter<DayProgramAdapter.Vi
         return periodsToSwitches(mDayProgram);
     }
 
-    private void updateDayLayout() {
+    public int getSwitchesActive() {
+        return 2 * mDayProgram.size();
+    }
+
+    private void updateDayLayout(boolean hasChanged) {
         List<DayPart> dayLayout = new ArrayList<>();
         if (mDayProgram.size() == 0) {
             Period period = new Period();
@@ -152,20 +181,13 @@ public class DayProgramAdapter extends RecyclerView.Adapter<DayProgramAdapter.Vi
             }
         }
         mDayLayout = dayLayout;
-        /* // Todo remove for production.
-        Log.d(TAG, "mDayLayout");
-        for (DayPart part : dayLayout) {
-            int[] begin = part.mPeriod.getBeginTime();
-            int[] end = part.mPeriod.getEndTime();
-            String text = begin[0] + "," + begin[1] + "\u2014" + end[0] + "," + end[1];
-            if (part.mDayTemperature) {
-                text += ", day";
-            } else {
-                text += ", night";
-            }
-            Log.d(TAG, text);
+        if (hasChanged) {
+            upload();
         }
-        */
+    }
+
+    private void upload() {
+        mAdapter.upload();
     }
 
     private void updateRecyclerHeight() {
@@ -190,8 +212,8 @@ public class DayProgramAdapter extends RecyclerView.Adapter<DayProgramAdapter.Vi
         final Animation a = new Animation() {
             @Override
             protected void applyTransformation(float interpolated, Transformation t) {
-                int height = currentHeight + (int) (interpolated * (targetHeight - currentHeight));
-                mObserver.getLayoutParams().height = height;
+                mObserver.getLayoutParams().height = currentHeight + (int) (interpolated *
+                        (targetHeight - currentHeight));
                 mObserver.requestLayout();
             }
 
@@ -213,7 +235,7 @@ public class DayProgramAdapter extends RecyclerView.Adapter<DayProgramAdapter.Vi
     private void remove(int position) {
         mDayProgram.remove(mDayLayout.get(position).mProgramPosition);
         int dayLayoutSizeBefore = mDayLayout.size();
-        updateDayLayout();
+        updateDayLayout(true);
         int dayLayoutSizeAfter = mDayLayout.size();
         notifyItemRangeRemoved(position, dayLayoutSizeBefore - dayLayoutSizeAfter);
         notifyItemRangeChanged(0, mDayLayout.size());
@@ -227,7 +249,7 @@ public class DayProgramAdapter extends RecyclerView.Adapter<DayProgramAdapter.Vi
         day.setBeginTime(timeAddDuration(night.mPeriod.getBeginTime(), offset));
         day.setEndTime(timeAddDuration(night.mPeriod.getBeginTime(), 2 * offset));
         mDayProgram.add(night.mProgramPosition, day);
-        updateDayLayout();
+        updateDayLayout(true);
         notifyItemRangeInserted(position + 1, 2);
         notifyItemRangeChanged(0, mDayLayout.size());
         updateRecyclerHeight(); // Todo: probably add animation.
@@ -261,6 +283,10 @@ public class DayProgramAdapter extends RecyclerView.Adapter<DayProgramAdapter.Vi
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         if (inRange(new int[]{hourOfDay, minute}, rangeBegin, rangeEnd)) {
                             updateTime(position, beginTime, hourOfDay, minute);
+                        } else {
+                            Toast.makeText(view.getContext(),
+                                    view.getResources().getString(R.string.time_out_of_range),
+                                    Toast.LENGTH_LONG).show();
                         }
                     }
                 }, time[0], time[1], true);
@@ -285,7 +311,7 @@ public class DayProgramAdapter extends RecyclerView.Adapter<DayProgramAdapter.Vi
             period.setEndTime(new int[]{hourOfDay, minute});
         }
         int dayLayoutSizeBefore = mDayLayout.size();
-        updateDayLayout();
+        updateDayLayout(true);
         int dayLayoutSizeAfter = mDayLayout.size();
         notifyItemChanged(position);
         int changed = (beginTime) ? position - 1 : position + 1;
@@ -461,10 +487,6 @@ public class DayProgramAdapter extends RecyclerView.Adapter<DayProgramAdapter.Vi
          * Only for parts with day temperature: corresponding position in the day program array.
          */
         public final int mProgramPosition;
-
-        DayPart(Period period, boolean dayTemperature) {
-            this(period, dayTemperature, -1);
-        }
 
         DayPart(Period period, boolean dayTemperature, int programPosition) {
             mPeriod = period;

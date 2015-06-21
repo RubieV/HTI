@@ -31,8 +31,6 @@
     <style name="Display1Layout">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">72dp</item>
-        <item name="android:paddingLeft">16dp</item>
-        <item name="android:paddingRight">16dp</item>
     </style>
 
     <style name="Display1noLayout">
@@ -43,6 +41,11 @@
     <style name="WhiteButton" parent="Widget.AppCompat.Button">
         <item name="colorButtonNormal">#FFFFFFFF</item>
     </style>
+
+    <style name="AccentButton" parent="Widget.AppCompat.Button">
+        <item name="colorButtonNormal">@color/accent</item>
+    </style>
+
     <!--<style name="Title">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">56dp</item>

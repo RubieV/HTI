@@ -283,11 +283,8 @@ public class ThermostatFragment extends Fragment {
                 try {
                     final boolean firstRunFinal = firstRun;
                     if (firstRun) {
-                        String targetTemperature = HeatingSystem.get("targetTemperature");
-                        if (targetTemperature == null) throw new ConnectException("null");
                         String weekProgramState = HeatingSystem.get("weekProgramState");
                         if (weekProgramState == null) throw new ConnectException("null");
-                        mTargetTemperature = Float.parseFloat(targetTemperature);
                         mLocked = !weekProgramState.equals("on");
                     }
                     final String currentTemperature = HeatingSystem.get("currentTemperature");
@@ -296,12 +293,21 @@ public class ThermostatFragment extends Fragment {
                     if (day == null) throw new ConnectException("null");
                     final String time = HeatingSystem.get("time");
                     if (time == null) throw new ConnectException("null");
+                    String targetTempString = HeatingSystem.get("targetTemperature");
+                    if (targetTempString == null) throw new ConnectException("null");
+                    final float targetTemperature = Float.parseFloat(targetTempString);
                     mView.post(new Runnable() {
                         @Override
                         public void run() {
+                            if (mInterrupt) {
+                                return;
+                            }
                             showData(currentTemperature, day, time);
+                            if (targetTemperature != mTargetTemperature) {
+                                mTargetInput.setText(String.valueOf(targetTemperature));
+                                mTargetTemperature = targetTemperature;
+                            }
                             if (firstRunFinal) {
-                                showTargetTemperature();
                                 showLockedState();
                             }
                         }

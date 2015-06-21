@@ -10,8 +10,9 @@
     <string name="week_program">Week program</string>
     <string name="week_program_period">%1$s\u2014%2$s</string>
     <string name="day_program_empty">No day periods</string>
-    <string name="action_restore">Restore to defaults</string>
-    <string name="action_delete">Remove all records</string>
+    <string name="action_restore">Reset to default</string>
+    <string name="action_delete">Delete week program</string>
+    <string name="action_add">Add a day program</string>
     <string name="day_temperature">Day temperature</string>
     <string name="night_temperature">Night temperature</string>
     <string name="temperature_too_low">The temperature was too low,
@@ -20,7 +21,9 @@
         it is set to 30.0 \u00B0C.</string>
     <string name="set_unlocked">Unlock</string>
     <string name="set_locked">Lock</string>
-    <string name="rest_week_program">Do you want to reset the week program to default?</string>
+    <string name="rest_week_program">Reset week program to default?</string>
+    <string name="delete_week_program">Delete all week program items?</string>
+    <string name="time_out_of_range">The given time is outside of the possible range.</string>
 
     <string-array name="week_days">
         <item>Monday</item>

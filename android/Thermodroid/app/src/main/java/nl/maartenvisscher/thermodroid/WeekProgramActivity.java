@@ -1,19 +1,20 @@
 package nl.maartenvisscher.thermodroid;
 
-        import android.annotation.SuppressLint;
-        import android.app.Activity;
-        import android.app.Dialog;
-        import android.app.DialogFragment;
-        import android.content.DialogInterface;
-        import android.os.Bundle;
-        import android.support.v7.app.AlertDialog;
-        import android.support.v7.app.AppCompatActivity;
-        import android.view.Menu;
-        import android.view.MenuInflater;
-        import android.view.MenuItem;
+import android.annotation.SuppressLint;
+import android.app.Dialog;
+import android.app.DialogFragment;
+import android.content.DialogInterface;
+import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
+import android.support.v7.app.AppCompatActivity;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 
-        import org.thermostatapp.util.WeekProgram;
+import org.thermostatapp.util.HeatingSystem;
 
+import java.util.ArrayList;
+import java.util.List;
 
 public class WeekProgramActivity extends AppCompatActivity {
     WeekProgramFragment mFragment;
@@ -27,6 +28,8 @@ public class WeekProgramActivity extends AppCompatActivity {
         }
         mFragment = (WeekProgramFragment) getFragmentManager().findFragmentById(
                 R.id.week_program_fragment);
+        HeatingSystem.BASE_ADDRESS = "http://wwwis.win.tue.nl/2id40-ws/37";
+        HeatingSystem.WEEK_PROGRAM_ADDRESS = HeatingSystem.BASE_ADDRESS + "/weekProgram";
     }
 
     @Override
@@ -39,6 +42,15 @@ public class WeekProgramActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+            case R.id.action_add:
+                final List<Day> days = new ArrayList<>();
+                new DaySelectorDialog(days, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        mFragment.addDays(days);
+                    }
+                }).show(getFragmentManager(), "DaySelectorDialog");
+                return true;
             case R.id.action_restore:
                 new ResetWeekProgramDialogFragment(mFragment).show(mFragment.getFragmentManager(), "");
                 return true;
@@ -96,13 +108,13 @@ class DeleteWeekProgramDialogFragment extends DialogFragment  {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-        builder.setMessage(R.string.rest_week_program)
-                .setPositiveButton("Delete all", new DialogInterface.OnClickListener() {
+        builder.setMessage(R.string.delete_week_program)
+                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         _fragment.deleteWeekProgram();
                     }
                 })
-                .setNegativeButton("Keep", new DialogInterface.OnClickListener() {
+                .setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
 
                     }
