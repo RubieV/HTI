@@ -175,12 +175,12 @@ public class ThermostatFragment extends Fragment {
         if (temperature < 5.0f) {
             temperature = 5.0f;
             Toast.makeText(getActivity(), getString(R.string.temperature_too_low),
-                    Toast.LENGTH_SHORT).show();
+                    Toast.LENGTH_LONG).show();
         }
         if (temperature > 30.0f) {
             temperature = 30.0f;
             Toast.makeText(getActivity(), getString(R.string.temperature_too_high),
-                    Toast.LENGTH_SHORT).show();
+                    Toast.LENGTH_LONG).show();
         }
         setTemperature(temperature);
     }

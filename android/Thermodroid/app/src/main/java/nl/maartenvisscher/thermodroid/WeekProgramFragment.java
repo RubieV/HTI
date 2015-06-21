@@ -36,6 +36,8 @@ public class WeekProgramFragment extends Fragment {
     private WeekProgramAdapter mAdapter;
     private RelativeLayout mLoading;
     private RelativeLayout mMessage;
+    private EditText mDayTemperature;
+    private EditText mNightTemperature;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -44,8 +46,8 @@ public class WeekProgramFragment extends Fragment {
         mMain = (LinearLayout) mView.findViewById(R.id.main);
         mLoading = (RelativeLayout) mView.findViewById(R.id.loading);
         mMessage = (RelativeLayout) mView.findViewById(R.id.message);
-        EditText dayTemperature = (EditText) mView.findViewById(R.id.day_temperature_view);
-        EditText nightTemperature = (EditText) mView.findViewById(R.id.night_temperature_view);
+        mDayTemperature = (EditText) mView.findViewById(R.id.day_temperature_view);
+        mNightTemperature = (EditText) mView.findViewById(R.id.night_temperature_view);
         mRecyclerView = (RecyclerView) mView.findViewById(R.id.week_program_recycler_view);
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
@@ -63,10 +65,13 @@ public class WeekProgramFragment extends Fragment {
             }
         });
 
-        dayTemperature.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        mDayTemperature.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                if (actionId == EditorInfo.IME_ACTION_DONE
+                        || actionId == EditorInfo.IME_ACTION_GO
+                        || actionId == EditorInfo.IME_ACTION_SEND
+                        || actionId == EditorInfo.IME_ACTION_NEXT) {
                     setTemperatureFromInput(true, v);
                     focusableLayout.requestFocus();
                     InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
@@ -78,10 +83,13 @@ public class WeekProgramFragment extends Fragment {
             }
         });
 
-        nightTemperature.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        mNightTemperature.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                if (actionId == EditorInfo.IME_ACTION_DONE) {
+                if (actionId == EditorInfo.IME_ACTION_DONE
+                        || actionId == EditorInfo.IME_ACTION_GO
+                        || actionId == EditorInfo.IME_ACTION_SEND
+                        || actionId == EditorInfo.IME_ACTION_NEXT) {
                     setTemperatureFromInput(false, v);
                     focusableLayout.requestFocus();
                     InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(
@@ -117,29 +125,32 @@ public class WeekProgramFragment extends Fragment {
     }
 
     private void setTemperatureFromInput(boolean day, TextView input) {
-
-        temperature = Float.parseFloat(mTargetInput.getText().toString());
+        float temperature = Float.parseFloat(input.getText().toString());
         temperature = (float) Math.round(temperature * 10f) / 10f;
         if (temperature < 5.0f) {
             temperature = 5.0f;
             Toast.makeText(getActivity(), getString(R.string.temperature_too_low),
-                    Toast.LENGTH_SHORT).show();
+                    Toast.LENGTH_LONG).show();
         }
         if (temperature > 30.0f) {
             temperature = 30.0f;
             Toast.makeText(getActivity(), getString(R.string.temperature_too_high),
-                    Toast.LENGTH_SHORT).show();
+                    Toast.LENGTH_LONG).show();
         }
-        setTemperature(temperature);
-
+        setTemperature(day, temperature);
     }
 
     private void setTemperature(boolean day, float temperature) {
         new Thread(new TemperatureUploader(day, temperature)).start();
     }
 
+    private void showTemperatures(String day, String night) {
+        mDayTemperature.setText(day);
+        mNightTemperature.setText(night);
+    }
+
     private void connect() {
-        new Thread(new WeekProgramDownloader()).start();
+        new Thread(new Downloader()).start();
     }
 
     private void showConnectionMessage() {
@@ -175,12 +186,22 @@ public class WeekProgramFragment extends Fragment {
         }
     }
 
-    private class WeekProgramDownloader implements Runnable {
+    private class Downloader implements Runnable {
         @Override
         public void run() {
             WeekProgram weekProgram;
             try {
                 weekProgram = HeatingSystem.getWeekProgram();
+                final String dayTemperature = HeatingSystem.get("dayTemperature");
+                if (dayTemperature == null) throw new ConnectException("null");
+                final String nightTemperature = HeatingSystem.get("nightTemperature");
+                if (nightTemperature == null) throw new ConnectException("null");
+                mView.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        showTemperatures(dayTemperature, nightTemperature);
+                    }
+                });
             } catch (ConnectException e) {
                 weekProgram = null;
             } catch (CorruptWeekProgramException e) {
@@ -195,9 +216,7 @@ public class WeekProgramFragment extends Fragment {
                     public void run() {
                         mAdapter = new WeekProgramAdapter(weekProgramFinal);
                         mRecyclerView.setAdapter(mAdapter);
-                        if (mMain.getVisibility() != View.VISIBLE) {
-                            setVisibleView(mMain);
-                        }
+                        setVisibleView(mMain);
                     }
                 });
             } else {

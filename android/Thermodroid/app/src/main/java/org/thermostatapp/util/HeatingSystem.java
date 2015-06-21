@@ -418,7 +418,7 @@ public class HeatingSystem {
         } else if (attribute_name.equals("currentTemperature")) {
             tag_name = "current_temperature";
             inTemperatureBoundaries(value);
-        } else if (attribute_name.equals("mDayTemperature")) {
+        } else if (attribute_name.equals("dayTemperature")) {
             tag_name = "day_temperature";
             inTemperatureBoundaries(value);
         } else if (attribute_name.equals("nightTemperature")) {
