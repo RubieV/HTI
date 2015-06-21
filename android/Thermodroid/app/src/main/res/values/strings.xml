@@ -20,6 +20,7 @@
         it is set to 30.0 \u00B0C.</string>
     <string name="set_unlocked">Unlock</string>
     <string name="set_locked">Lock</string>
+    <string name="rest_week_program">Do you want to reset the week program to default?</string>
 
     <string-array name="week_days">
         <item>Monday</item>
