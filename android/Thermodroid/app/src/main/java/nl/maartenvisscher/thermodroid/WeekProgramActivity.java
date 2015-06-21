@@ -68,7 +68,7 @@ class ResetWeekProgramDialogFragment extends DialogFragment  {
         // Use the Builder class for convenient dialog construction
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         builder.setMessage(R.string.rest_week_program)
-                .setPositiveButton("Restore week proram to default", new DialogInterface.OnClickListener() {
+                .setPositiveButton("Reset", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         _fragment.restoreWeekProgram();
                     }
@@ -102,7 +102,7 @@ class DeleteWeekProgramDialogFragment extends DialogFragment  {
                         _fragment.deleteWeekProgram();
                     }
                 })
-                .setNegativeButton("Keep week program", new DialogInterface.OnClickListener() {
+                .setNegativeButton("Keep", new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
 
                     }
