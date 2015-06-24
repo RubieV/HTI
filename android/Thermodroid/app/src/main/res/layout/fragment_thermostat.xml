@@ -55,7 +55,7 @@
                     android:layout_gravity="center_horizontal"
                     android:drawableLeft="@drawable/ic_arrow_drop_up_black_24dp"
                     android:drawableStart="@drawable/ic_arrow_drop_up_black_24dp"
-                    android:text="Up" />
+                    android:text="@string/up" />
 
                 <RelativeLayout
                     style="@style/Display1Layout"
@@ -73,7 +73,7 @@
                         android:drawableLeft="@drawable/ic_lock_open_black_24dp"
                         android:drawableStart="@drawable/ic_lock_open_black_24dp"
                         android:src="@drawable/ic_lock_open_black_24dp"
-                        android:text="Lock" />
+                        android:text="@string/lock" />
 
                     <LinearLayout
                         android:id="@+id/focusable_layout"
@@ -108,7 +108,7 @@
                     android:layout_gravity="center_horizontal"
                     android:drawableLeft="@drawable/ic_arrow_drop_down_black_24dp"
                     android:drawableStart="@drawable/ic_arrow_drop_down_black_24dp"
-                    android:text="Down" />
+                    android:text="@string/down" />
 
             </LinearLayout>
         </ScrollView>
@@ -146,7 +146,6 @@
         android:id="@+id/loading"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:onClick="testInterrupt"
         android:visibility="gone">
 
         <ProgressBar

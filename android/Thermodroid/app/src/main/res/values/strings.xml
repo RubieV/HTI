@@ -5,8 +5,8 @@
     <string name="degrees_celcius"> \u00B0C</string>
     <string name="time">%1$s %2$s</string>
     <string name="target_temperature">Target temperature</string>
-    <string name="connection_message">The thermostat couldn\'t be reached, are you connected to the
-        internet? Click anywhere to try again.</string>
+    <string name="connection_message">The thermostat couldn\'t be reached, have you set a server?
+        Click anywhere to try again.</string>
     <string name="week_program">Week program</string>
     <string name="week_program_period">%1$s\u2014%2$s</string>
     <string name="day_program_empty">No day periods</string>
@@ -24,6 +24,8 @@
     <string name="rest_week_program">Reset week program to default?</string>
     <string name="delete_week_program">Delete all week program items?</string>
     <string name="time_out_of_range">The given time is outside of the possible range.</string>
+    <string name="change_server">Change server</string>
+    <string name="dash">\u2014</string>
 
     <string-array name="week_days">
         <item>Monday</item>
@@ -38,6 +40,7 @@
     <string name="font_body1">sans-serif</string>
     <string name="font_body2">sans-serif-medium</string>
     <string name="title_activity_week_program">Week program</string>
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
+    <string name="up">Up</string>
+    <string name="lock">Lock</string>
+    <string name="down">Down</string>
 </resources>

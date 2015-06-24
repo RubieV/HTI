@@ -35,8 +35,6 @@ public class ThermostatFragment extends Fragment {
 
     private float mTargetTemperature = 0;
     private boolean mLocked;
-    private volatile boolean mInterrupt;
-    private Thread mDataThread;
     private View mView;
     private TextView mTime;
     private TextView mCurrentTemp;
@@ -47,11 +45,7 @@ public class ThermostatFragment extends Fragment {
     private Button mTempUpButton;
     private Button mTempDownButton;
     private Button mLockButton;
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
+    private DataRunnable mDataRunnable;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -122,15 +116,15 @@ public class ThermostatFragment extends Fragment {
     }
 
     @Override
-    public void onStart() {
+    public void onResume() {
         connect();
-        super.onStart();
+        super.onResume();
     }
 
     @Override
-    public void onStop() {
-        mInterrupt = true;
-        super.onStop();
+    public void onPause() {
+        disconnect();
+        super.onPause();
     }
 
     private void showData(String currentTemp, String day, String time) {
@@ -233,11 +227,23 @@ public class ThermostatFragment extends Fragment {
         visibleView.setVisibility(View.VISIBLE);
     }
 
-    private void connect() {
-        setVisibleView(mLoading); // TODO, low priority: do not show loading screen when restarted (only when started for first time)
-        mInterrupt = false;
-        mDataThread = new Thread(new DataRunnable());
-        mDataThread.start();
+    void connect() {
+        if (HeatingSystem.BASE_ADDRESS.equals("")) {
+            showConnectionMessage();
+            return;
+        }
+        setVisibleView(mLoading);
+        disconnect();
+        mDataRunnable = new DataRunnable();
+        new Thread(mDataRunnable).start();
+    }
+
+    private void disconnect() {
+        if (mDataRunnable == null) {
+            return;
+        }
+        mDataRunnable.interrupt();
+        mDataRunnable = null;
     }
 
     private class TargetTemperatureRunnable implements Runnable {
@@ -252,7 +258,7 @@ public class ThermostatFragment extends Fragment {
             try {
                 HeatingSystem.put("currentTemperature", String.valueOf(mTemperature));
             } catch (InvalidInputValueException e) {
-                // Todo show message
+                Log.e(TAG, "InvalidInputValueException: " + e.getMessage());
             }
         }
     }
@@ -270,18 +276,19 @@ public class ThermostatFragment extends Fragment {
                 String locked = (mIsLocked) ? "off" : "on";
                 HeatingSystem.put("weekProgramState", locked);
             } catch (InvalidInputValueException e) {
-                // Todo show message
+                Log.e(TAG, "InvalidInputValueException: " + e.getMessage());
             }
         }
     }
 
     private class DataRunnable implements Runnable {
+        private volatile boolean mInterrupt = false;
+
         @Override
         public void run() {
             boolean firstRun = true;
             while (!mInterrupt) {
                 try {
-                    final boolean firstRunFinal = firstRun;
                     if (firstRun) {
                         String weekProgramState = HeatingSystem.get("weekProgramState");
                         if (weekProgramState == null) throw new ConnectException("null");
@@ -296,6 +303,7 @@ public class ThermostatFragment extends Fragment {
                     String targetTempString = HeatingSystem.get("targetTemperature");
                     if (targetTempString == null) throw new ConnectException("null");
                     final float targetTemperature = Float.parseFloat(targetTempString);
+                    final boolean firstRunFinal = firstRun;
                     mView.post(new Runnable() {
                         @Override
                         public void run() {
@@ -320,7 +328,7 @@ public class ThermostatFragment extends Fragment {
                             showConnectionMessage();
                         }
                     });
-                    break; // TODO: instead of breaking, automatically try to reconnect (just remove this break, but leave it for now)
+                    break;
                 }
                 try {
                     Thread.sleep(10);
@@ -329,6 +337,10 @@ public class ThermostatFragment extends Fragment {
                 }
                 firstRun = false;
             }
+        }
+
+        public void interrupt() {
+            mInterrupt = true;
         }
     }
 }

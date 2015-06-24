@@ -17,7 +17,8 @@
             android:layout_height="72dp"
             android:elevation="2dp"
             android:focusableInTouchMode="true"
-            android:orientation="horizontal">
+            android:orientation="horizontal"
+            android:baselineAligned="false">
 
             <RelativeLayout
                 android:layout_width="0dp"
@@ -33,7 +34,8 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="16dp"
                     android:layout_marginStart="16dp"
-                    android:src="@drawable/ic_brightness_7_black_24dp" />
+                    android:src="@drawable/ic_brightness_7_black_24dp"
+                    android:contentDescription="@string/day_temperature"/>
 
                 <EditText
                     android:id="@+id/day_temperature_view"
@@ -77,7 +79,8 @@
                     android:layout_centerVertical="true"
                     android:layout_marginLeft="16dp"
                     android:layout_marginStart="16dp"
-                    android:src="@drawable/ic_brightness_3_black_24dp" />
+                    android:src="@drawable/ic_brightness_3_black_24dp"
+                    android:contentDescription="@string/night_temperature"/>
 
                 <EditText
                     android:id="@+id/night_temperature_view"

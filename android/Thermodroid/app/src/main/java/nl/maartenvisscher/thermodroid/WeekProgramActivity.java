@@ -11,8 +11,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 
-import org.thermostatapp.util.HeatingSystem;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,8 +26,6 @@ public class WeekProgramActivity extends AppCompatActivity {
         }
         mFragment = (WeekProgramFragment) getFragmentManager().findFragmentById(
                 R.id.week_program_fragment);
-        HeatingSystem.BASE_ADDRESS = "http://wwwis.win.tue.nl/2id40-ws/37";
-        HeatingSystem.WEEK_PROGRAM_ADDRESS = HeatingSystem.BASE_ADDRESS + "/weekProgram";
     }
 
     @Override
@@ -44,12 +40,15 @@ public class WeekProgramActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.action_add:
                 final List<Day> days = new ArrayList<>();
-                new DaySelectorDialog(days, new DialogInterface.OnClickListener() {
+                DaySelectorDialog dialog = new DaySelectorDialog();
+                dialog.setDays(days);
+                dialog.setOnClickListener(new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         mFragment.addDays(days);
                     }
-                }).show(getFragmentManager(), "DaySelectorDialog");
+                });
+                dialog.show(getFragmentManager(), "DaySelectorDialog");
                 return true;
             case R.id.action_restore:
                 new ResetWeekProgramDialogFragment(mFragment).show(mFragment.getFragmentManager(), "");

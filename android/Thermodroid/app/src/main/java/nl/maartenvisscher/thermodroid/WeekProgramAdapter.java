@@ -1,7 +1,6 @@
 package nl.maartenvisscher.thermodroid;
 
 import android.app.Fragment;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.res.Resources;
 import android.support.v7.widget.LinearLayoutManager;
@@ -155,7 +154,6 @@ public class WeekProgramAdapter extends RecyclerView.Adapter<WeekProgramAdapter.
 
     @Override
     public void onBindViewHolder(WeekProgramAdapter.ViewHolder holder, final int position) {
-        Context c = holder.mView.getContext();
         Resources r = holder.mView.getResources();
         DayProgramAdapter dayProgram = mDayPrograms.get(position);
 
@@ -171,12 +169,15 @@ public class WeekProgramAdapter extends RecyclerView.Adapter<WeekProgramAdapter.
         holder.mDaysEdit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new DaySelectorDialog(dialogDays, new DialogInterface.OnClickListener() {
+                DaySelectorDialog dialog = new DaySelectorDialog();
+                dialog.setDays(dialogDays);
+                dialog.setOnClickListener(new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         setDayProgramDays(position, dialogDays);
                     }
-                }).show(mFragment.getFragmentManager(), "DaySelectorDialog");
+                });
+                dialog.show(mFragment.getFragmentManager(), "DaySelectorDialog");
             }
         });
     }

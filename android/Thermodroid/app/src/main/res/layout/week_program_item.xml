@@ -19,6 +19,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"
                 android:layout_marginLeft="72dp"
+                android:layout_marginStart="72dp"
                 android:layout_marginTop="16dp"
                 android:layout_toLeftOf="@+id/btn_set_days"
                 android:layout_toStartOf="@+id/btn_set_days"

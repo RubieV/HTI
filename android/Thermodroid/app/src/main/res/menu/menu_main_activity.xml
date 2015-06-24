@@ -1,2 +1,11 @@
-<menu xmlns:tools="http://schemas.android.com/tools"
-    tools:context="nl.maartenvisscher.thermodroid.WeekProgramActivity"></menu>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="nl.maartenvisscher.thermodroid.WeekProgramActivity">
+
+    <item
+        android:id="@+id/action_set_server"
+        android:title="@string/change_server"
+        app:showAsAction="never" />
+
+</menu>

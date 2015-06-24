@@ -40,6 +40,7 @@ public class WeekProgramFragment extends Fragment {
     private RelativeLayout mMessage;
     private EditText mDayTemperature;
     private EditText mNightTemperature;
+    private volatile boolean mViewAttachedToWindow = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,9 +52,6 @@ public class WeekProgramFragment extends Fragment {
         mDayTemperature = (EditText) mView.findViewById(R.id.day_temperature_view);
         mNightTemperature = (EditText) mView.findViewById(R.id.night_temperature_view);
         mRecyclerView = (RecyclerView) mView.findViewById(R.id.week_program_recycler_view);
-        // use this setting to improve performance if you know that changes
-        // in content do not change the layout size of the RecyclerView
-        //mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mView.getContext()));
         final LinearLayout focusableLayout = (LinearLayout)
                 mView.findViewById(R.id.focusable_layout);
@@ -64,6 +62,17 @@ public class WeekProgramFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 connect();
+            }
+        });
+
+        mView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+                mViewAttachedToWindow = true;
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
             }
         });
 
@@ -106,8 +115,8 @@ public class WeekProgramFragment extends Fragment {
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
+    public void onResume() {
+        super.onResume();
         connect();
     }
 
@@ -159,6 +168,11 @@ public class WeekProgramFragment extends Fragment {
     }
 
     private void connect() {
+        if (HeatingSystem.BASE_ADDRESS.equals("")) {
+            showConnectionMessage();
+            return;
+        }
+        setVisibleView(mLoading);
         new Thread(new Downloader(this)).start();
     }
 
@@ -189,53 +203,75 @@ public class WeekProgramFragment extends Fragment {
             try {
                 HeatingSystem.put(attribute, String.valueOf(mTemperature));
             } catch (InvalidInputValueException e) {
-                // Todo maybe?
+                Log.e(TAG, "InvalidInputValueException: " + e.getMessage());
+            }
+            try {
+                final String temperature = HeatingSystem.get(attribute);
+                if (mDay) {
+                    mView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mDayTemperature.setText(temperature);
+                        }
+                    });
+                } else {
+                    mView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            mNightTemperature.setText(temperature);
+                        }
+                    });
+                }
+            } catch (ConnectException e) {
+                Log.e(TAG, "ConnectException: " + e.getMessage());
             }
 
         }
     }
 
     private class Downloader implements Runnable {
-        Fragment mFragment;
+        private final Fragment mFragment;
 
         Downloader(Fragment fragment) {
             mFragment = fragment;
         }
+
         @Override
         public void run() {
-            WeekProgram weekProgram;
+            while (!mViewAttachedToWindow) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    return;
+                }
+            }
             try {
-                weekProgram = HeatingSystem.getWeekProgram();
+                final WeekProgram weekProgram = HeatingSystem.getWeekProgram();
                 final String dayTemperature = HeatingSystem.get("dayTemperature");
-                if (dayTemperature == null) throw new ConnectException("null");
                 final String nightTemperature = HeatingSystem.get("nightTemperature");
-                if (nightTemperature == null) throw new ConnectException("null");
+                if (weekProgram == null || dayTemperature == null || nightTemperature == null) {
+                    throw new ConnectException("null");
+                }
                 mView.post(new Runnable() {
                     @Override
                     public void run() {
+                        mAdapter = new WeekProgramAdapter(weekProgram, mFragment);
+                        mRecyclerView.setAdapter(mAdapter);
                         showTemperatures(dayTemperature, nightTemperature);
+                        setVisibleView(mMain);
                     }
                 });
             } catch (ConnectException e) {
                 Log.e(TAG, "ConnectException: " + e.getMessage());
-                weekProgram = null;
-            } catch (CorruptWeekProgramException e) {
-                Log.e(TAG, "CorruptWeekProgramException: " + e.getMessage());
-                weekProgram = new WeekProgram();
-                HeatingSystem.setWeekProgram(weekProgram);
-            }
-            final WeekProgram weekProgramFinal = weekProgram;
-
-            if (weekProgramFinal != null) {
                 mView.post(new Runnable() {
                     @Override
                     public void run() {
-                        mAdapter = new WeekProgramAdapter(weekProgramFinal, mFragment);
-                        mRecyclerView.setAdapter(mAdapter);
-                        setVisibleView(mMain);
+                        showConnectionMessage();
                     }
                 });
-            } else {
+            } catch (CorruptWeekProgramException e) {
+                Log.e(TAG, "CorruptWeekProgramException: " + e.getMessage());
+                HeatingSystem.setWeekProgram(new WeekProgram());
                 mView.post(new Runnable() {
                     @Override
                     public void run() {

@@ -1,26 +1,27 @@
 package nl.maartenvisscher.thermodroid;
 
-import android.annotation.SuppressLint;
 import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Created by Ruben on 21-6-2015.
+ * Day selector dialog.
  */
-
-@SuppressLint("ValidFragment")
-class DaySelectorDialog extends DialogFragment {
+public class DaySelectorDialog extends DialogFragment {
 
     private List<Day> mDays;
     private DialogInterface.OnClickListener mListener;
 
-    DaySelectorDialog(List<Day> days, DialogInterface.OnClickListener listener) {
+    public void setDays(List<Day> days) {
         mDays = days;
+    }
+
+    public void setOnClickListener(DialogInterface.OnClickListener listener) {
         mListener = listener;
     }
 
