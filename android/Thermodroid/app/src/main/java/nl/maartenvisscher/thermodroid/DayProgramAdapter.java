@@ -29,9 +29,12 @@ import java.util.List;
 public class DayProgramAdapter extends RecyclerView.Adapter<DayProgramAdapter.ViewHolder> {
 
     public static final String TAG = "DayProgramAdapter";
+    /**
+     * The days which are associated with this day program.
+     */
     private List<Day> mDays;
     /**
-     * Holds all periods of the day which have day temperature (i.e. not night temperature).
+     * All periods of the day which have day temperature (i.e. not night temperature).
      */
     private List<Period> mDayProgram;
     /**
@@ -116,6 +119,13 @@ public class DayProgramAdapter extends RecyclerView.Adapter<DayProgramAdapter.Vi
         return result;
     }
 
+    /**
+     * Converts given day periods (used in this class) to a list of switches (used by the
+     * HeatingSystem API).
+     *
+     * @param periods the day periods.
+     * @return a list of switches.
+     */
     private List<Switch> periodsToSwitches(List<Period> periods) {
         List<Switch> switches = new ArrayList<>();
         for (Period period : periods) {
@@ -123,12 +133,16 @@ public class DayProgramAdapter extends RecyclerView.Adapter<DayProgramAdapter.Vi
             if (beginTime.length() == 4) {
                 beginTime = "0" + beginTime;
             }
-            String endTime = period.getEndText();
-            if (endTime.length() == 4) {
-                endTime = "0" + endTime;
-            }
             switches.add(new Switch("day", true, beginTime));
-            switches.add(new Switch("night", true, endTime));
+            if (!period.isEndOfDay()) {
+                String endTime = period.getEndText();
+                if (endTime.length() == 4) {
+                    endTime = "0" + endTime;
+                }
+                switches.add(new Switch("night", true, endTime));
+            } else {
+                switches.add(new Switch("night", false, "01:00"));
+            }
         }
         while (switches.size() < 10) {
             switches.add(new Switch("day", false, "01:00"));
@@ -143,6 +157,12 @@ public class DayProgramAdapter extends RecyclerView.Adapter<DayProgramAdapter.Vi
         return new int[]{Integer.parseInt(front), Integer.parseInt(back)};
     }
 
+    /**
+     * Returns the day and night periods of this day program in the list of switches format as used
+     * by the HeatingSystem API.
+     *
+     * @return the list of switches.
+     */
     public List<Switch> getSwitches() {
         return periodsToSwitches(mDayProgram);
     }
@@ -151,6 +171,11 @@ public class DayProgramAdapter extends RecyclerView.Adapter<DayProgramAdapter.Vi
         return 2 * mDayProgram.size();
     }
 
+    /**
+     * Updates the day layout according to the day program.
+     *
+     * @param hasChanged whether there is need for uploading the new day layout.
+     */
     private void updateDayLayout(boolean hasChanged) {
         List<DayPart> dayLayout = new ArrayList<>();
         if (mDayProgram.size() == 0) {
@@ -232,6 +257,11 @@ public class DayProgramAdapter extends RecyclerView.Adapter<DayProgramAdapter.Vi
         }, mObserver.getItemAnimator().getRemoveDuration());
     }
 
+    /**
+     * Removes a day part from the program.
+     *
+     * @param position the layout position to remove.
+     */
     private void remove(int position) {
         mDayProgram.remove(mDayLayout.get(position).mProgramPosition);
         int dayLayoutSizeBefore = mDayLayout.size();
@@ -242,6 +272,11 @@ public class DayProgramAdapter extends RecyclerView.Adapter<DayProgramAdapter.Vi
         updateRecyclerHeightAnimated();
     }
 
+    /**
+     * Adds a day part to the day program at given (night) position.
+     *
+     * @param position the night position where to add the new day part.
+     */
     private void add(int position) {
         DayPart night = mDayLayout.get(position);
         int offset = night.mPeriod.getDuration() / 3;
@@ -255,6 +290,13 @@ public class DayProgramAdapter extends RecyclerView.Adapter<DayProgramAdapter.Vi
         updateRecyclerHeight(); // Todo: probably add animation.
     }
 
+    /**
+     * Creates a time picker dialog for given day part of the day for begin time or end time.
+     *
+     * @param position  the day part for which the time picker dialog should be shown.
+     * @param beginTime whether the dialog should show the begin time or the end time.
+     * @param context   is needed to create the dialog.
+     */
     private void showTimeDialog(final int position, final boolean beginTime, Context context) {
         DayPart day = mDayLayout.get(position);
         final int[] rangeBegin;
@@ -283,16 +325,29 @@ public class DayProgramAdapter extends RecyclerView.Adapter<DayProgramAdapter.Vi
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         if (inRange(new int[]{hourOfDay, minute}, rangeBegin, rangeEnd)) {
                             updateTime(position, beginTime, hourOfDay, minute);
-                        } else {
-                            Toast.makeText(view.getContext(),
-                                    view.getResources().getString(R.string.time_out_of_range),
-                                    Toast.LENGTH_LONG).show();
+                            return;
                         }
+                        if (hourOfDay == 0 && minute == 0 && inRange(new int[]{24, 0}, rangeBegin,
+                                rangeEnd)) {
+                            updateTime(position, beginTime, 24, 0);
+                            return;
+                        }
+                        Toast.makeText(view.getContext(),
+                                view.getResources().getString(R.string.time_out_of_range),
+                                Toast.LENGTH_LONG).show();
                     }
                 }, time[0], time[1], true);
         timePicker.show();
     }
 
+    /**
+     * Returns whether given time is in given range.
+     *
+     * @param time       the time.
+     * @param rangeBegin the start of the range.
+     * @param rangeEnd   the end of the range.
+     * @return whether given time is in given range.
+     */
     private boolean inRange(int[] time, int[] rangeBegin, int[] rangeEnd) {
         if (time[0] < rangeBegin[0] || (time[0] == rangeBegin[0] && time[1] < rangeBegin[1])) {
             return false;
@@ -302,6 +357,14 @@ public class DayProgramAdapter extends RecyclerView.Adapter<DayProgramAdapter.Vi
         return true;
     }
 
+    /**
+     * Updates the time of given day part.
+     *
+     * @param position  the day layout item to update.
+     * @param beginTime whether begin time or end time should be updated.
+     * @param hourOfDay the new hour of day.
+     * @param minute    the new minute.
+     */
     private void updateTime(int position, boolean beginTime, int hourOfDay, int minute) {
         int programPosition = mDayLayout.get(position).mProgramPosition;
         Period period = mDayProgram.get(programPosition);

@@ -39,7 +39,7 @@
 
                 <TextView
                     android:id="@+id/currentTemp"
-                    style="@style/Display1"
+                    style="@style/Display2"
                     android:gravity="center" />
 
                 <TextView

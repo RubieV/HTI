@@ -24,8 +24,7 @@ public class MainActivity extends AppCompatActivity {
         mFragment = (ThermostatFragment)
                 getFragmentManager().findFragmentById(R.id.thermostat_fragment);
         if (HeatingSystem.BASE_ADDRESS.equals("")) {
-            new SelectorDialog().setFragment(mFragment).show(getFragmentManager(),
-                    "SelectorDialog");
+            HeatingSystem.BASE_ADDRESS = "http://wwwis.win.tue.nl/2id40-ws/37";
         }
     }
 
@@ -51,7 +50,7 @@ public class MainActivity extends AppCompatActivity {
     public static class SelectorDialog extends DialogFragment {
 
         private final String[] SERVERS = {"http://wwwis.win.tue.nl/2id40-ws/37",
-                "http://pcwin889.win.tue.nl/2id40-ws/37", "http://hti.maartenvisscher.nl/37"};
+                "http://pcwin889.win.tue.nl/2id40-ws/37"};
         private int mWhich = 0;
         private ThermostatFragment mFragment;
 

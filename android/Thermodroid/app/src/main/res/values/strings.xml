@@ -5,8 +5,8 @@
     <string name="degrees_celcius"> \u00B0C</string>
     <string name="time">%1$s %2$s</string>
     <string name="target_temperature">Target temperature</string>
-    <string name="connection_message">The thermostat couldn\'t be reached, have you set a server?
-        Click anywhere to try again.</string>
+    <string name="connection_message">The thermostat couldn\'t be reached. You can try selecting a
+        different server in the upper-right menu or click anywhere to try again.</string>
     <string name="week_program">Week program</string>
     <string name="week_program_period">%1$s\u2014%2$s</string>
     <string name="day_program_empty">No day periods</string>

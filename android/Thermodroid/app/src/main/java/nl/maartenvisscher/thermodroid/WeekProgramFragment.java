@@ -18,6 +18,8 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.bartoszlipinski.recyclerviewheader.RecyclerViewHeader;
+
 import org.thermostatapp.util.CorruptWeekProgramException;
 import org.thermostatapp.util.HeatingSystem;
 import org.thermostatapp.util.InvalidInputValueException;
@@ -49,10 +51,14 @@ public class WeekProgramFragment extends Fragment {
         mMain = (LinearLayout) mView.findViewById(R.id.main);
         mLoading = (RelativeLayout) mView.findViewById(R.id.loading);
         mMessage = (RelativeLayout) mView.findViewById(R.id.message);
-        mDayTemperature = (EditText) mView.findViewById(R.id.day_temperature_view);
-        mNightTemperature = (EditText) mView.findViewById(R.id.night_temperature_view);
         mRecyclerView = (RecyclerView) mView.findViewById(R.id.week_program_recycler_view);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(mView.getContext()));
+        RecyclerViewHeader header = RecyclerViewHeader.fromXml(inflater.getContext(),
+                R.layout.week_program_header);
+        header.attachTo(mRecyclerView);
+        mDayTemperature = (EditText) header.findViewById(R.id.day_temperature_view);
+        mNightTemperature = (EditText) header.findViewById(R.id.night_temperature_view);
+
         final LinearLayout focusableLayout = (LinearLayout)
                 mView.findViewById(R.id.focusable_layout);
 

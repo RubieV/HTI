@@ -7,8 +7,8 @@ android {
         applicationId "nl.maartenvisscher.thermodroid"
         minSdkVersion 16
         targetSdkVersion 22
-        versionCode 2
-        versionName "1.1"
+        versionCode 3
+        versionName "1.2"
     }
     buildTypes {
         release {
@@ -28,4 +28,5 @@ dependencies {
     compile 'com.android.support:appcompat-v7:22.2.0'
     compile 'com.android.support:cardview-v7:22.2.0'
     compile 'com.android.support:recyclerview-v7:22.2.0'
+    compile 'com.bartoszlipinski.recyclerviewheader:library:1.2.0'
 }

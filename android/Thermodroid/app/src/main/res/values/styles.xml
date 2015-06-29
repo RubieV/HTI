@@ -28,6 +28,15 @@
         <item name="android:textColor">@color/light_bg_primary_text</item>
     </style>
 
+    <style name="Display2">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">72dp</item>
+        <item name="android:paddingLeft">16dp</item>
+        <item name="android:paddingRight">16dp</item>
+        <item name="android:gravity">center_vertical</item>
+        <item name="android:textSize">45sp</item>
+        <item name="android:textColor">@color/light_bg_primary_text</item>
+    </style>
     <style name="Display1Layout">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">72dp</item>

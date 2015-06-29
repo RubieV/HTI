@@ -46,6 +46,7 @@ public class ThermostatFragment extends Fragment {
     private Button mTempDownButton;
     private Button mLockButton;
     private DataRunnable mDataRunnable;
+    private volatile boolean mViewAttachedToWindow = false;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -110,6 +111,17 @@ public class ThermostatFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 toggleLocked();
+            }
+        });
+
+        mView.addOnAttachStateChangeListener(new View.OnAttachStateChangeListener() {
+            @Override
+            public void onViewAttachedToWindow(View v) {
+                mViewAttachedToWindow = true;
+            }
+
+            @Override
+            public void onViewDetachedFromWindow(View v) {
             }
         });
         return mView;
@@ -202,20 +214,20 @@ public class ThermostatFragment extends Fragment {
             mTargetInput.setEnabled(false);
             mLockButton.setText(getString(R.string.set_unlocked));
             mLockButton.setCompoundDrawablesWithIntrinsicBounds(
-                    R.drawable.ic_lock_open_black_24dp, 0, 0, 0);
+                    R.drawable.ic_lock_black_24dp, 0, 0, 0);
             if (Build.VERSION.SDK_INT >= 17) {
                 mLockButton.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                        R.drawable.ic_lock_open_black_24dp, 0, 0, 0);
+                        R.drawable.ic_lock_black_24dp, 0, 0, 0);
             }
         } else {
             showTargetTemperature();
             mTargetInput.setEnabled(true);
             mLockButton.setText(getString(R.string.set_locked));
             mLockButton.setCompoundDrawablesWithIntrinsicBounds(
-                    R.drawable.ic_lock_black_24dp, 0, 0, 0);
+                    R.drawable.ic_lock_open_black_24dp, 0, 0, 0);
             if (Build.VERSION.SDK_INT >= 17) {
                 mLockButton.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                        R.drawable.ic_lock_black_24dp, 0, 0, 0);
+                        R.drawable.ic_lock_open_black_24dp, 0, 0, 0);
             }
         }
     }
@@ -255,11 +267,13 @@ public class ThermostatFragment extends Fragment {
 
         @Override
         public void run() {
+            mDataRunnable.pauseTargetTemperature();
             try {
                 HeatingSystem.put("currentTemperature", String.valueOf(mTemperature));
             } catch (InvalidInputValueException e) {
                 Log.e(TAG, "InvalidInputValueException: " + e.getMessage());
             }
+            mDataRunnable.resumeTargetTemperature();
         }
     }
 
@@ -283,16 +297,52 @@ public class ThermostatFragment extends Fragment {
 
     private class DataRunnable implements Runnable {
         private volatile boolean mInterrupt = false;
+        private volatile boolean mUpdateTargetTemperature = true;
 
         @Override
         public void run() {
+            while (!mViewAttachedToWindow) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    return;
+                }
+            }
             boolean firstRun = true;
             while (!mInterrupt) {
                 try {
                     if (firstRun) {
                         String weekProgramState = HeatingSystem.get("weekProgramState");
                         if (weekProgramState == null) throw new ConnectException("null");
-                        mLocked = !weekProgramState.equals("on");
+                        final boolean locked = !weekProgramState.equals("on");
+                        mView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (mInterrupt) {
+                                    return;
+                                }
+                                mLocked = locked;
+                                showLockedState();
+                            }
+                        });
+                        firstRun = false;
+                    }
+                    if (mUpdateTargetTemperature) {
+                        String targetTemperatureString = HeatingSystem.get("targetTemperature");
+                        if (targetTemperatureString == null) throw new ConnectException("null");
+                        final float targetTemperature = Float.parseFloat(targetTemperatureString);
+                        mView.post(new Runnable() {
+                            @Override
+                            public void run() {
+                                if (mInterrupt || !mUpdateTargetTemperature
+                                        || targetTemperature == mTargetTemperature) {
+                                    return;
+                                }
+                                mTargetTemperature = targetTemperature;
+                                mTargetInput.setText(String.valueOf(targetTemperature));
+                                // Todo: fix bug: also update up/down button state (enabled or not)
+                            }
+                        });
                     }
                     final String currentTemperature = HeatingSystem.get("currentTemperature");
                     if (currentTemperature == null) throw new ConnectException("null");
@@ -300,10 +350,6 @@ public class ThermostatFragment extends Fragment {
                     if (day == null) throw new ConnectException("null");
                     final String time = HeatingSystem.get("time");
                     if (time == null) throw new ConnectException("null");
-                    String targetTempString = HeatingSystem.get("targetTemperature");
-                    if (targetTempString == null) throw new ConnectException("null");
-                    final float targetTemperature = Float.parseFloat(targetTempString);
-                    final boolean firstRunFinal = firstRun;
                     mView.post(new Runnable() {
                         @Override
                         public void run() {
@@ -311,13 +357,6 @@ public class ThermostatFragment extends Fragment {
                                 return;
                             }
                             showData(currentTemperature, day, time);
-                            if (targetTemperature != mTargetTemperature) {
-                                mTargetInput.setText(String.valueOf(targetTemperature));
-                                mTargetTemperature = targetTemperature;
-                            }
-                            if (firstRunFinal) {
-                                showLockedState();
-                            }
                         }
                     });
                 } catch (ConnectException e) {
@@ -331,16 +370,23 @@ public class ThermostatFragment extends Fragment {
                     break;
                 }
                 try {
-                    Thread.sleep(10);
+                    Thread.sleep(50);
                 } catch (InterruptedException e) {
                     break;
                 }
-                firstRun = false;
             }
         }
 
         public void interrupt() {
             mInterrupt = true;
+        }
+
+        public void pauseTargetTemperature() {
+            mUpdateTargetTemperature = false;
+        }
+
+        public void resumeTargetTemperature() {
+            mUpdateTargetTemperature = true;
         }
     }
 }
